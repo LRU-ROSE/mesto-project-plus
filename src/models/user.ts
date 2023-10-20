@@ -12,4 +12,4 @@ const userSchema = new Schema<UserType>({
   avatar: { type: String, required: true },
 });
 
-export default mongoose.model<UserType>('user', userSchema);
+export default mongoose.model<UserType>("user", userSchema);

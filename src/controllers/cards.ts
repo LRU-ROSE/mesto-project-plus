@@ -1,10 +1,10 @@
 import { Response } from "express";
-import Card, { CardType } from "../models/card";
 import { UserRequest } from "@/lib/userRequest";
 import HTTPCode from "@/lib/codes";
 import { DocumentNotFound, DocumentType } from "@/lib/errors/DocumentNotFound";
 import getUserId from "@/lib/getUser";
 import checkId from "@/lib/checkId";
+import Card, { CardType } from "../models/card";
 
 export const getAllCards = async (_req: UserRequest, res: Response) => {
   const cards = await Card.find({}).populate(["owner", "likes"]);
@@ -13,7 +13,7 @@ export const getAllCards = async (_req: UserRequest, res: Response) => {
 
 export const createCard = async (
   req: UserRequest<Pick<CardType, "name" | "link">>,
-  res: Response
+  res: Response,
 ) => {
   const userId = getUserId(req);
   const { name, link } = req.body;
@@ -22,7 +22,7 @@ export const createCard = async (
 };
 
 export const deleteCard = async (req: UserRequest, res: Response) => {
-  const _ = getUserId(req);
+  getUserId(req);
   const cardId = checkId(req.params.cardId, DocumentType.Card);
   const card = await Card.findByIdAndRemove(cardId)
     .orFail(() => new DocumentNotFound(DocumentType.Card))
@@ -38,7 +38,7 @@ export const likeCard = async (req: UserRequest, res: Response) => {
     { $addToSet: { likes: userId } },
     {
       returnDocument: "after",
-    }
+    },
   )
     .orFail(() => new DocumentNotFound(DocumentType.Card))
     .populate(["owner", "likes"]);
@@ -53,8 +53,7 @@ export const dislikeCard = async (req: UserRequest, res: Response) => {
     { $pull: { likes: userId } },
     {
       returnDocument: "after",
-      runValidators: true,
-    }
+    },
   )
     .orFail(() => new DocumentNotFound(DocumentType.Card))
     .populate(["owner", "likes"]);

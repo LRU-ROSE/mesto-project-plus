@@ -1,6 +1,6 @@
 export const enum DocumentType {
   User,
-  Card
+  Card,
 }
 
 export class DocumentNotFound extends Error {
@@ -12,6 +12,8 @@ export class DocumentNotFound extends Error {
       case DocumentType.Card:
         super("Запрошенная карточка не найдена");
         break;
+      default:
+        throw new Error("unreachable");
     }
   }
 }

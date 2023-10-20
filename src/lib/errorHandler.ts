@@ -5,11 +5,13 @@ import { DocumentNotFound } from "./errors/DocumentNotFound";
 
 const ErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
   if (res.headersSent) {
-    return next(err)
+    // Код взят из хэлпа к express. https://expressjs.com/en/guide/error-handling.html#the-default-error-handler
+    // Возражения посылайте в https://github.com/expressjs/express/issues (правда проект полумёртвый...)
+    return next(err);
   }
   if (err instanceof DocumentNotFound) {
     return res.status(HTTPCode.NOT_FOUND).json({
-      message: err.message
+      message: err.message,
     });
   }
   if (
@@ -23,6 +25,6 @@ const ErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
   return res.status(HTTPCode.DEFAULT).json({
     message: `На сервере произошла ошибка ${err}`,
   });
-}
+};
 
 export default ErrorHandler;
