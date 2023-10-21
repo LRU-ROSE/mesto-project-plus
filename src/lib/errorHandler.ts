@@ -5,15 +5,15 @@ import { DocumentNotFound } from "./errors/DocumentNotFound";
 
 const ErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
   if (res.headersSent) {
-    // Код взят из хэлпа к express. https://expressjs.com/en/guide/error-handling.html#the-default-error-handler
-    // Возражения посылайте в https://github.com/expressjs/express/issues (правда проект полумёртвый...)
-    return next(err);
+    return;
   }
+
   if (err instanceof DocumentNotFound) {
     return res.status(HTTPCode.NOT_FOUND).json({
       message: err.message,
     });
   }
+
   if (
     err instanceof mongoose.Error.CastError ||
     err instanceof mongoose.Error.ValidationError
@@ -22,6 +22,7 @@ const ErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
       message: `Переданы некорректные данные: ${err.message}`,
     });
   }
+
   return res.status(HTTPCode.DEFAULT).json({
     message: `На сервере произошла ошибка ${err}`,
   });

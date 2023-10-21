@@ -14,15 +14,18 @@ app.use((req: UserRequest, res, next) => {
   req.user = {
     _id: "65327ff35c6c77186e647395",
   };
-
   next();
 });
 
 app.use(router);
 
-// Глобальный обработчик ошибок. Благодаря этой магии все контроллеры выше не нужно
-// оборачивать в try/catch. Эта штука сама всё словит. Не верите - проверьте сами.
-app.use(ErrorHandler);
+app.use((req, res, next) => {
+  try {
+    ErrorHandler(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+});
 
 const main = async () => {
   await mongoose.connect("mongodb://127.0.0.1:27017/mestodb");
