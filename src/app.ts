@@ -14,18 +14,13 @@ app.use((req: UserRequest, res, next) => {
   req.user = {
     _id: "65327ff35c6c77186e647395",
   };
+
   next();
 });
 
 app.use(router);
 
-app.use((req, res, next) => {
-  try {
-    ErrorHandler(req, res, next);
-  } catch (error) {
-    next(error);
-  }
-});
+app.use(ErrorHandler);
 
 const main = async () => {
   await mongoose.connect("mongodb://127.0.0.1:27017/mestodb");
