@@ -3,11 +3,7 @@ import mongoose from "mongoose";
 import HTTPCode from "./codes";
 import { DocumentNotFound } from "./errors/DocumentNotFound";
 
-const ErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
-  if (res.headersSent) {
-    return;
-  }
-
+const ErrorHandler: ErrorRequestHandler = (err, _req, res) => {
   if (err instanceof DocumentNotFound) {
     return res.status(HTTPCode.NOT_FOUND).json({
       message: err.message,

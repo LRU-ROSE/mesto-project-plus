@@ -1,54 +1,64 @@
-import { Response } from "express";
+import { Response, NextFunction } from "express";
 import { UserRequest } from "@/lib/userRequest";
 import HTTPCode from "@/lib/codes";
 import { DocumentNotFound, DocumentType } from "@/lib/errors/DocumentNotFound";
-import getUserId from "@/lib/getUser";
-import checkId from "@/lib/checkId";
 import Card, { CardType } from "../models/card";
 
-export const getAllCards = async (_req: UserRequest, res: Response) => {
+export const getAllCards = async (
+  _req: UserRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const cards = await Card.find({}).populate(["owner", "likes"]);
     res.json(cards);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
 export const createCard = async (
   req: UserRequest<Pick<CardType, "name" | "link">>,
   res: Response,
+  next: NextFunction,
 ) => {
   try {
-    const userId = getUserId(req);
+    const userId = req.user?._id;
     const { name, link } = req.body;
     const card = await Card.create({ owner: userId, name, link });
     res.status(HTTPCode.DOC_CREATED).json(card);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
-export const deleteCard = async (req: UserRequest, res: Response) => {
+export const deleteCard = async (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    getUserId(req);
-    const cardId = checkId(req.params.cardId, DocumentType.Card);
+    const { cardId } = req.params;
     const card = await Card.findByIdAndRemove(cardId)
       .orFail(() => new DocumentNotFound(DocumentType.Card))
       .populate(["owner", "likes"]);
     res.json(card);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
-export const likeCard = async (req: UserRequest, res: Response) => {
+export const likeCard = async (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const userId = getUserId(req);
-    const cardId = checkId(req.params.cardId, DocumentType.Card);
+    const userId = req.user?._id;
+    const { cardId } = req.params;
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: userId } },
@@ -61,14 +71,18 @@ export const likeCard = async (req: UserRequest, res: Response) => {
     res.json(card);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
-export const dislikeCard = async (req: UserRequest, res: Response) => {
+export const dislikeCard = async (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const userId = getUserId(req);
-    const cardId = checkId(req.params.cardId, DocumentType.Card);
+    const userId = req.user?._id;
+    const { cardId } = req.params;
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $pull: { likes: userId } },
@@ -81,6 +95,6 @@ export const dislikeCard = async (req: UserRequest, res: Response) => {
     res.json(card);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
