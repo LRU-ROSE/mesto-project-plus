@@ -1,22 +1,15 @@
+import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
+import "dotenv/config";
 import ErrorHandler from "./lib/errorHandler";
 import router from "./routers";
-import { UserRequest } from "./lib/userRequest";
 
 const PORT = 3000;
 
 const app = express();
-
+app.use(cors());
 app.use(express.json());
-
-app.use((req: UserRequest, res, next) => {
-  req.user = {
-    _id: "65327ff35c6c77186e647395",
-  };
-
-  next();
-});
 
 app.use(router);
 

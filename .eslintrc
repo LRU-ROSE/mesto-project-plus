@@ -61,6 +61,7 @@
     "@typescript-eslint/no-shadow": [
       "error"
     ],
-    "no-console": "off"
+    "no-console": "off",
+    "no-restricted-syntax": "off"
   }
 }

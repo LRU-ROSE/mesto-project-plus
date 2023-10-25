@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { UserRequest } from "@/lib/userRequest";
 import HTTPCode from "@/lib/codes";
+import InvalidUser from "@/lib/errors/InvalidUser";
 import { DocumentNotFound, DocumentType } from "@/lib/errors/DocumentNotFound";
 import Card, { CardType } from "../models/card";
 
@@ -40,10 +41,17 @@ export const deleteCard = async (
   next: NextFunction,
 ) => {
   try {
+    const userId = req.user?._id;
     const { cardId } = req.params;
-    const card = await Card.findByIdAndRemove(cardId)
+    const card = await Card.findById(cardId)
       .orFail(() => new DocumentNotFound(DocumentType.Card))
       .populate(["owner", "likes"]);
+    if (card.owner._id.toHexString() !== userId) {
+      throw new InvalidUser();
+    }
+    await Card.findByIdAndDelete(cardId).orFail(
+      () => new DocumentNotFound(DocumentType.Card),
+    );
     res.json(card);
   } catch (error) {
     console.error(error);
