@@ -1,21 +1,27 @@
 import { ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
 import HTTPCode from "./codes";
-import { DocumentNotFound } from "./errors/DocumentNotFound";
-import InvalidUser from "./errors/InvalidUser";
+import { NotFound } from "./errors/NotFound";
+import Unauthorized from "./errors/Unauthorized";
+import Forbidden from "./errors/Forbidden";
 
 const ErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }
-  if (err instanceof DocumentNotFound) {
+  if (err instanceof NotFound) {
     return res.status(HTTPCode.NOT_FOUND).json({
       message: err.message,
     });
   }
-  if (err instanceof InvalidUser) {
+  if (err instanceof Unauthorized) {
     return res.status(HTTPCode.UNAUTHORIZED).json({
-      message: "Необходима авторизация",
+      message: err.message,
+    });
+  }
+  if (err instanceof Forbidden) {
+    return res.status(HTTPCode.FORBIDDEN).json({
+      message: err.message,
     });
   }
 

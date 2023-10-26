@@ -53,15 +53,17 @@
         ]
       }
     ],
+    // Выключаем правила для js и включаем соответствующие для ts.
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
       "error"
     ],
+    // Выключаем правила для js и включаем соответствующие для ts.
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": [
       "error"
     ],
-    "no-console": "off",
-    "no-restricted-syntax": "off"
+
+    "no-restricted-syntax": "off" // Для использования for of
   }
 }
