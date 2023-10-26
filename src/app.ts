@@ -19,7 +19,9 @@ import cardsRouter from "./routers/cards";
 // "dev": "ts-node-dev -r tsconfig-paths/register src/app.ts",
 // Потому видимо и не помечается как "используемая", так-как в самом коде её нет.
 
-const PORT = 3200;
+// У меня в консоле ничего не выводится и ошибок нет, если у вас что-то есть, опишите подробнее.
+
+const PORT = 3000;
 
 const app = express();
 app.use(cors());

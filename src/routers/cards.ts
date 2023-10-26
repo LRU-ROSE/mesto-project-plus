@@ -7,13 +7,6 @@ import {
   likeCard,
   dislikeCard,
 } from "@/controllers/cards";
-import idValidator from "@/lib/validators";
-
-const validateCardId = celebrate({
-  [Segments.QUERY]: {
-    cardId: idValidator,
-  },
-});
 
 const cardsRouter = Router();
 cardsRouter.get("/", getAllCards);
@@ -26,8 +19,8 @@ const validateCreateCard = celebrate({
 });
 cardsRouter.post("/", validateCreateCard, createCard);
 
-cardsRouter.delete("/:cardId", validateCardId, deleteCard);
-cardsRouter.put("/:cardId/likes", validateCardId, likeCard);
-cardsRouter.delete("/:cardId/likes", validateCardId, dislikeCard);
+cardsRouter.delete("/:cardId", deleteCard);
+cardsRouter.put("/:cardId/likes", likeCard);
+cardsRouter.delete("/:cardId/likes", dislikeCard);
 
 export default cardsRouter;

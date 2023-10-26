@@ -1,8 +1,9 @@
 import HTTPCode from "../codes";
-import StatusError from "./StatusError";
 
-export default class Unauthorized extends StatusError {
+export default class Unauthorized extends Error {
+  statusCode: HTTPCode = HTTPCode.UNAUTHORIZED;
+
   constructor() {
-    super("Необходима авторизация", HTTPCode.UNAUTHORIZED);
+    super("Необходима авторизация");
   }
 }

@@ -6,17 +6,10 @@ import {
   updateAvatar,
   updateUserInfo,
 } from "@/controllers/users";
-import idValidator from "@/lib/validators";
-
-export const validateUserId = celebrate({
-  [Segments.QUERY]: {
-    cardId: idValidator,
-  },
-});
 
 const usersRouter = Router();
 usersRouter.get("/", getAllUsers);
-usersRouter.get("/:userId", validateUserId, getUser);
+usersRouter.get("/:userId", getUser);
 
 const validateUpdateUserInfo = celebrate({
   [Segments.BODY]: Joi.object().keys({
