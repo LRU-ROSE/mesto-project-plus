@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import "dotenv/config";
+import { Joi, Segments, celebrate } from "celebrate";
 import { errorLogger } from "./lib/logger";
 import notFound from "./controllers/notFound";
 import { createNewUser, login } from "./controllers/users";
@@ -27,8 +28,26 @@ app.use(express.json());
 app.use(requestLoggerMiddleware);
 app.use("/users", authMiddleware, usersRouter);
 app.use("/cards", authMiddleware, cardsRouter);
-app.post("/signin", login);
-app.post("/signup", createNewUser);
+
+const validateLogin = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+});
+app.post("/signin", validateLogin, login);
+
+const validatecCeateNewUser = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    email: Joi.string().required().email(),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(200),
+    avatar: Joi.string().required().uri(),
+    password: Joi.string().required(),
+  }),
+});
+app.post("/signup", validatecCeateNewUser, createNewUser);
+
 app.use(notFound);
 app.use(errorLoggerMiddleware);
 app.use(ErrorHandler);

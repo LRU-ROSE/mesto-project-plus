@@ -1,33 +1,23 @@
 import { ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
+import { isCelebrateError } from "celebrate";
 import HTTPCode from "./codes";
-import { NotFound } from "./errors/NotFound";
-import Unauthorized from "./errors/Unauthorized";
-import Forbidden from "./errors/Forbidden";
+import StatusError from "./errors/StatusError";
 
 const ErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }
-  if (err instanceof NotFound) {
-    return res.status(HTTPCode.NOT_FOUND).json({
-      message: err.message,
-    });
-  }
-  if (err instanceof Unauthorized) {
-    return res.status(HTTPCode.UNAUTHORIZED).json({
-      message: err.message,
-    });
-  }
-  if (err instanceof Forbidden) {
-    return res.status(HTTPCode.FORBIDDEN).json({
+  if (err instanceof StatusError) {
+    return res.status(err.statusCode).json({
       message: err.message,
     });
   }
 
   if (
     err instanceof mongoose.Error.CastError ||
-    err instanceof mongoose.Error.ValidationError
+    err instanceof mongoose.Error.ValidationError ||
+    isCelebrateError(err)
   ) {
     return res.status(HTTPCode.BAD_REQUEST).json({
       message: `Переданы некорректные данные: ${err.message}`,

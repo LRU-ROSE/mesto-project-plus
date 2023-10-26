@@ -1,5 +1,8 @@
-export default class Forbidden extends Error {
+import HTTPCode from "../codes";
+import StatusError from "./StatusError";
+
+export default class Forbidden extends StatusError {
   constructor() {
-    super("Доступ запрещён");
+    super("Доступ запрещён", HTTPCode.FORBIDDEN);
   }
 }
