@@ -20,7 +20,8 @@ const authMiddleware = async (
   try {
     req.user = jwt.verify(token, config.JWT_SECRET) as UserData;
   } catch (err) {
-    throw new Unauthorized();
+    next(new Unauthorized());
+    return;
   }
   next();
 };
