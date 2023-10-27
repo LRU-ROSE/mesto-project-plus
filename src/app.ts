@@ -14,12 +14,7 @@ import {
 import ErrorHandler from "./lib/errorHandler";
 import usersRouter from "./routers/users";
 import cardsRouter from "./routers/cards";
-
-// Зависимость tsconfig-paths используется в команде dev:
-// "dev": "ts-node-dev -r tsconfig-paths/register src/app.ts",
-// Потому видимо и не помечается как "используемая", так-как в самом коде её нет.
-
-// У меня в консоле ничего не выводится и ошибок нет, если у вас что-то есть, опишите подробнее.
+import { fixValidationError } from "./lib/errors/replaceValidationError";
 
 const PORT = 3000;
 
@@ -37,7 +32,7 @@ const validateLogin = celebrate({
     password: Joi.string().required(),
   }),
 });
-app.post("/signin", validateLogin, login);
+app.post("/signin", fixValidationError(validateLogin), login);
 
 const validatecCeateNewUser = celebrate({
   [Segments.BODY]: Joi.object().keys({
@@ -48,7 +43,7 @@ const validatecCeateNewUser = celebrate({
     password: Joi.string().required(),
   }),
 });
-app.post("/signup", validatecCeateNewUser, createNewUser);
+app.post("/signup", fixValidationError(validatecCeateNewUser), createNewUser);
 
 app.use(notFound);
 app.use(errorLoggerMiddleware);

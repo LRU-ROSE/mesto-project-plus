@@ -3,6 +3,7 @@ import { UserRequest } from "@/lib/userRequest";
 import HTTPCode from "@/lib/codes";
 import { NotFound, DocumentType } from "@/lib/errors/NotFound";
 import Conflict from "@/lib/errors/Conflict";
+import replaceValidationError from "@/lib/errors/replaceValidationError";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import Unauthorized from "@/lib/errors/Unauthorized";
@@ -18,7 +19,22 @@ export const getAllUsers = async (
     const users = await User.find({});
     res.json(users);
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
+  }
+};
+
+const getUserHelper = async (
+  userId: string | undefined,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = await User.findById(userId).orFail(
+      () => new NotFound(DocumentType.User),
+    );
+    res.json(user);
+  } catch (error) {
+    next(replaceValidationError(error));
   }
 };
 
@@ -27,15 +43,15 @@ export const getUser = async (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    const userId = req.user?._id;
-    const user = await User.findById(userId).orFail(
-      () => new NotFound(DocumentType.User),
-    );
-    res.json(user);
-  } catch (error) {
-    next(error);
-  }
+  getUserHelper(req.params.userId, res, next);
+};
+
+export const getMe = async (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  getUserHelper(req.user?._id, res, next);
 };
 
 export const createNewUser = async (
@@ -65,7 +81,7 @@ export const createNewUser = async (
     if (error.name === "MongoServerError" && error.code === 11000) {
       next(new Conflict("email уже существует"));
     } else {
-      next(error);
+      next(replaceValidationError(error));
     }
   }
 };
@@ -83,7 +99,7 @@ async function updateInfo(
     }).orFail(() => new NotFound(DocumentType.User));
     res.json(user);
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
   }
 }
 
@@ -142,6 +158,6 @@ export const login = async (
         .send();
     }
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
   }
 };

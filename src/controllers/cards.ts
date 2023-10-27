@@ -3,6 +3,7 @@ import { UserRequest } from "@/lib/userRequest";
 import HTTPCode from "@/lib/codes";
 import Forbidden from "@/lib/errors/Forbidden";
 import { NotFound, DocumentType } from "@/lib/errors/NotFound";
+import replaceValidationError from "@/lib/errors/replaceValidationError";
 import Card, { CardType } from "../models/card";
 
 export const getAllCards = async (
@@ -16,7 +17,7 @@ export const getAllCards = async (
       .populate("likes", "_id");
     res.json(cards);
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
   }
 };
 
@@ -31,7 +32,7 @@ export const createCard = async (
     const card = await Card.create({ owner: userId, name, link });
     res.status(HTTPCode.DOC_CREATED).json(card);
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
   }
 };
 
@@ -55,7 +56,7 @@ export const deleteCard = async (
     );
     res.json(card);
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
   }
 };
 
@@ -79,7 +80,7 @@ export const likeCard = async (
       .populate("likes", "_id");
     res.json(card);
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
   }
 };
 
@@ -103,6 +104,6 @@ export const dislikeCard = async (
       .populate("likes", "_id");
     res.json(card);
   } catch (error) {
-    next(error);
+    next(replaceValidationError(error));
   }
 };
